@@ -3,36 +3,45 @@ import altair as alt
 import math
 import pandas as pd
 import streamlit as st
+import sys
+sys.path.append('/Users/seanstrong/Code/mailmince/frontend/.venv/lib/python3.7/site-packages')
+
+# from 'utilities' import networking
+#import networking.py from the utilities folder
+from utilities import networking
+
 
 """
 # ✉️ MailMince
 
 Upload a CSV of the mailing list you want to segment. We'll then allow you to:
-- Augment the list with data
-- Get analytics on domains
-- Segment the list based on augmented data
-- Export curated CSVs
-- Send emails to the curated CSVs
+1. Augment the emails
+2. Get analytics on domains, roles, and company types
+3. Segment the list & export audiences based on data
+4. Send emails to custom lists
 """
 
+def main():
+    st.title("CSV Uploader in Streamlit")
 
-with st.echo(code_location='below'):
-    total_points = st.slider("Number of points in spiral", 1, 5000, 2000)
-    num_turns = st.slider("Number of turns in spiral", 1, 100, 9)
+    uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
 
-    Point = namedtuple('Point', 'x y')
-    data = []
+    if uploaded_file is not None:
+        # Read the uploaded CSV file
+        df = pd.read_csv(uploaded_file, header=None)
+        
+        # Display the DataFrame
+        st.write(df)
 
-    points_per_turn = total_points / num_turns
+        # Extract the domain from each email
+        df['domain'] = df[0].str.extract('@([\w.-]+)')
 
-    for curr_point_num in range(total_points):
-        curr_turn, i = divmod(curr_point_num, points_per_turn)
-        angle = (curr_turn + 1) * 2 * math.pi * i / points_per_turn
-        radius = curr_point_num / total_points
-        x = radius * math.cos(angle)
-        y = radius * math.sin(angle)
-        data.append(Point(x, y))
+        # Get unique domains as a list
+        domain_counts = df['domain'].value_counts()
+        domain_counts_dict = domain_counts.to_dict()
+        st.write(domain_counts_dict)
 
-    st.altair_chart(alt.Chart(pd.DataFrame(data), height=500, width=500)
-        .mark_circle(color='#0068c9', opacity=0.5)
-        .encode(x='x:Q', y='y:Q'))
+        networking.process_email('pejman@pear.vc')
+
+if __name__ == "__main__":
+    main()
