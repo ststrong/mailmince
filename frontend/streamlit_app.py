@@ -5,16 +5,14 @@ import pandas as pd
 import streamlit as st
 
 """
-# Welcome to Streamlit!
+# ✉️ MailMince
 
-Wow `/streamlit_app.py` to customize this app to your heart's desire :heart:
-
-It literally just uses the comments that's really fookin cool
-
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
-
-In the meantime, below is an example of what you can do with just a few lines of code:
+Upload a CSV of the mailing list you want to segment. We'll then allow you to:
+- Augment the list with data
+- Get analytics on domains
+- Segment the list based on augmented data
+- Export curated CSVs
+- Send emails to the curated CSVs
 """
 
 
