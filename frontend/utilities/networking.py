@@ -18,18 +18,20 @@ async def clearbit_augment(email):
 
    if doc.exists:
       print(f'Document data: {doc.to_dict()}')
-      return
+      return doc.to_dict()
    else:
       url = 'https://person.clearbit.com/v1/people/email/' + email
       api_key = 'sk_c3e44704c248baa7f20aea39c324cfb7'
-
+      
       async with aiohttp.ClientSession() as session:
          async with session.get(url, auth=aiohttp.BasicAuth(api_key, '')) as response:
-            if response.status == 200:
+               if response.status == 200:
                   data = await response.json()
                   await add_to_firebase(email, data)
-            else:
+                  return data  # Return the email data
+               else:
                   print(f"Error {response.status}: {await response.text()}")
+                  return None
 
 
 async def add_to_firebase(id, record):
@@ -47,4 +49,5 @@ def process_email(email):
         else:
             raise
 
-    loop.run_until_complete(clearbit_augment(email))
+    email_data = loop.run_until_complete(clearbit_augment(email))
+    return email_data  # Return the email data as JSON
