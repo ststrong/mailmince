@@ -6,7 +6,7 @@ from firebase_admin import credentials, firestore
 
 # Firebase Initialization
 if not firebase_admin._apps:
-    cred = credentials.Certificate("../mailmince-76315-firebase-adminsdk-95piz-b8c8d88bb5.json")
+    cred = credentials.Certificate("frontend/mailmince-76315-firebase-adminsdk-95piz-b8c8d88bb5.json")
     firebase_admin.initialize_app(cred)
 
 async def clearbit_augment(email):
