@@ -162,7 +162,7 @@ def main():
     if st.button("Convert and Execute"):
         # Convert plaintext to Firebase query using OpenAI
         query = get_firebase_query_from_openai(plaintext)
-        st.write(f"Generated Firebase Query:\n {query}")
+        st.write(f"{query}")
 
         queries = parse_openai_response(query)
         results = execute_firebase_query(queries)
@@ -170,24 +170,61 @@ def main():
         # st.write("Query Results:", results)
         df = firebase_response_to_dataframe(results)
 
+        def extract_full_name(x):
+            if pd.notnull(x) and isinstance(x, dict) and 'fullName' in x:
+                return x['fullName']
+            return None
 
-        if df['name'].apply(type).eq(str).all():
-            # If all values are strings, then convert them to dictionaries
-            df['name'] = df['name'].apply(eval)
+        def extract_employer(x):
+            if pd.notnull(x) and isinstance(x, dict) and 'name' in x:
+                return x['name']
+            return None
 
-        # Now, you don't need to use eval() anymore since the values are already dictionaries
-        df['Full name'] = df['name'].apply(lambda x: x['fullName'] if pd.notnull(x) and isinstance(x, dict) and 'fullName' in x else None)
-        df['Employer'] = df['employment'].apply(lambda x: x['name'] if pd.notnull(x) and isinstance(x, dict) and 'name' in x else None)
-        df['Title'] = df['employment'].apply(lambda x: x['title'] if pd.notnull(x) and isinstance(x, dict) and 'title' in x else None)
-        df['LinkedIn URL'] = df['linkedin'].apply(lambda x: 'https://www.linkedin.com/' + x['handle'] if pd.notnull(x) and isinstance(x, dict) and 'handle' in x else None)
+        def extract_title(x):
+            if pd.notnull(x) and isinstance(x, dict) and 'title' in x:
+                return x['title']
+            return None
+
+        def extract_linkedin_url(x):
+            if pd.notnull(x) and isinstance(x, dict) and 'handle' in x and x['handle'] is not None:
+                return 'https://www.linkedin.com/' + x['handle']
+            return None
+
+        if not df.empty and 'name' in df.columns:
+            if df['name'].apply(type).eq(str).all():
+                # If all values are strings, then convert them to dictionaries
+                df['name'] = df['name'].apply(eval)
+
+            # Now, you don't need to use eval() anymore since the values are already dictionaries
+            df['Full name'] = df['name'].apply(extract_full_name)
+
+        if not df.empty and 'employment' in df.columns:
+            df['Employer'] = df['employment'].apply(extract_employer)
+            df['Title'] = df['employment'].apply(extract_title)
+
+        if not df.empty and 'linkedin' in df.columns:
+            df['LinkedIn URL'] = df['linkedin'].apply(extract_linkedin_url)
 
 
-        desired_columns = ['email', 'Full name', 'LinkedIn URL', 'Employer', 'Title', 'location']
-        filtered_df = df[desired_columns]
+        # # Now, you don't need to use eval() anymore since the values are already dictionaries
+        # df['Full name'] = df['name'].apply(extract_full_name)
+        # df['Employer'] = df['employment'].apply(extract_employer)
+        # df['Title'] = df['employment'].apply(extract_title)
+        # df['LinkedIn URL'] = df['linkedin'].apply(extract_linkedin_url)
+
+        if not df.empty:
+            desired_columns = ['email', 'Full name', 'LinkedIn URL', 'Employer', 'Title', 'location']
+            filtered_df = df[desired_columns]
 
 
-        st.write("Query Results", filtered_df)
-        st.markdown(get_table_download_link(filtered_df), unsafe_allow_html=True)
+            st.write("Query Results", filtered_df)
+            st.markdown(get_table_download_link(filtered_df), unsafe_allow_html=True)
+        else:
+            st.write("No results found.")
+
+
+
+
 
 def firebase_response_to_dataframe(docs):
     """
