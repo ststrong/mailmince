@@ -20,7 +20,7 @@ async def clearbit_augment(email):
       print(f'Document data: {doc.to_dict()}')
       return doc.to_dict()
    else:
-      url = 'https://person.clearbit.com/v1/people/email/' + email
+      url = 'https://person-stream.clearbit.com/v1/people/email/' + email
       api_key = 'sk_c3e44704c248baa7f20aea39c324cfb7'
       
       async with aiohttp.ClientSession() as session:

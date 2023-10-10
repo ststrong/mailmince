@@ -10,10 +10,6 @@ from utilities import networking
 
 
 def main():
-    # st.title("Add emails")
-
-    
-   
     ind_upload()
     bulk_upload()
 
@@ -42,21 +38,32 @@ def ind_upload():
             else:
                 st.warning("Please enter an email.")
 
-def bulk_upload(limit=5):
+def bulk_upload(limit=50):
     st.subheader("Add emails in bulk:")
 
     uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
 
     if uploaded_file is not None:
         # Read the uploaded CSV file
-        df = pd.read_csv(uploaded_file, header=None)
+        df = pd.read_csv(uploaded_file)
 
+        # Check if there's an 'email' field in the CSV
+        email_field = None
+        for col in df.columns:
+            if 'email' in col.lower():
+                email_field = col
+                break
+
+        # If no email field is found, assume the entire CSV is a list of emails
+        if email_field is None:
+            df.columns = ['Original Email']
+            email_field = 'Original Email'
 
         # Define the count N
         N = limit  # or any other value you want
 
         # Create a new DataFrame to store original and processed emails
-        processed_df = df.iloc[:N].copy()
+        processed_df = df[[email_field]].iloc[:N].copy()
         processed_df.columns = ['Original Email']
 
         # Apply the process_email() function on each email up to count N
