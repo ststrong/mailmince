@@ -42,7 +42,7 @@ def ind_upload():
             else:
                 st.warning("Please enter an email.")
 
-def bulk_upload(limit=1):
+def bulk_upload(limit=5):
     st.subheader("Add emails in bulk:")
 
     uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
