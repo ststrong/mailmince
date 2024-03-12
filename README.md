@@ -4,4 +4,4 @@ Mincemail is an experiment in email (a) augmentation, (b) segmentation, and (c) 
 
 The app works via taking in emails individually or over CSV, enriching via the Clearbit API, and then allowing for plaintext queries over the set of emails. It uses a Firebase backend.
 
-A live demo can be accessed at https://mincemail.streamlit.app/, but is only partially functional due to rate limiting with Clearbit's API.
+A live demo can be accessed at https://mincemail.streamlit.app/, but is only partially functional due to rate limiting with Clearbit's API and auth issues with OpenAIs API.
